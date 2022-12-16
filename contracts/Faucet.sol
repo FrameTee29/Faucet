@@ -2,10 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./test/interfaces/IToken.sol";
 
 contract Faucet {
     address public owner;
-    uint256 public amountAllowed = 1000 ether;
+    uint256 public amountAllowed = 1000000 ether;
 
     /**
      * LockTime
@@ -67,13 +68,7 @@ contract Faucet {
             "lock time has not expired. Please try again later"
         );
 
-        uint256 amount = IERC20(tokenAddress).balanceOf(address(this));
-        require(
-            amount > amountAllowed,
-            "Not enough funds in the faucet. Please donate"
-        );
-
-        IERC20(tokenAddress).transfer(msg.sender, amountAllowed);
+        IToken(tokenAddress).mint(msg.sender, amountAllowed);
 
         //updates locktime 1 day from now
         lockTime[msg.sender][tokenAddress] = block.timestamp + 1 days;
